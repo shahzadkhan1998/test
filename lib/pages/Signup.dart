@@ -1,3 +1,6 @@
+import 'package:ecommerce/db/users.dart';
+import 'package:ecommerce/pages/home.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Signup extends StatefulWidget {
@@ -8,6 +11,8 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+  UserServices _userServices = UserServices();
+  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
   TextEditingController _emailTexController = TextEditingController();
   TextEditingController _passwordTexController = TextEditingController();
@@ -217,5 +222,28 @@ class _SignupState extends State<Signup> {
     );
   }
 
-  void validateForm() {}
+  void validateForm() async {
+    Map value;
+    FormState formState = _formKey.currentState;
+
+    if (formState.validate()) {
+      final User user = firebaseAuth.currentUser;
+      if (user == null) {
+        firebaseAuth
+            .createUserWithEmailAndPassword(
+                email: _emailTexController.text,
+                password: _passwordTexController.text)
+            .then((user) => {
+                  _userServices.createUser(user.user.uid, {
+                    "username": user.user.displayName,
+                    "email": user.user.email,
+                    "userId": user.user.uid,
+                  })
+                })
+            .catchError((e) => {print(e.toString())});
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => home()));
+      }
+    }
+  }
 }
