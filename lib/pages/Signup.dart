@@ -76,7 +76,7 @@ class _SignupState extends State<Signup> {
                           if (value.isEmpty) {
                             return " NAme Cannot Be Empty";
                           }
-                          return Email = value;
+                          return null;
                         },
                       ),
                       SizedBox(
@@ -95,7 +95,7 @@ class _SignupState extends State<Signup> {
                           if (value.isEmpty) {
                             return " EMail Cannot Be Empty";
                           }
-                          return Email = value;
+                          return null;
                         },
                       ),
                       SizedBox(
@@ -122,10 +122,10 @@ class _SignupState extends State<Signup> {
                         validator: (value) {
                           if (value.isEmpty) {
                             return "Password Cannot Be Empty";
-                          } else if (value.length > 6) {
+                          } else if (value.length < 6) {
                             return "Password Must be At least 6 digits";
                           }
-                          return Email = value;
+                          return null;
                         },
                       ),
                       SizedBox(
@@ -152,13 +152,13 @@ class _SignupState extends State<Signup> {
                         validator: (value) {
                           if (value.isEmpty) {
                             return "Password Cannot Be Empty";
-                          } else if (value.length > 6) {
+                          } else if (value.length < 6) {
                             return "Password Must be At least 6 digits";
                           } else if (_conformpasswordTexController.text !=
                               value) {
                             return "password do not match ";
                           }
-                          return Email = value;
+                          return null;
                         },
                       ),
                     ],
@@ -173,8 +173,9 @@ class _SignupState extends State<Signup> {
                   borderRadius: BorderRadius.circular(20.0),
                   color: Colors.cyan,
                   child: MaterialButton(
-                    onPressed: () {
+                    onPressed: () async {
                       validateForm();
+                      print("iam workiing");
                     },
                     minWidth: 0.7 * MediaQuery.of(context).size.width,
                     child: Text(
@@ -222,8 +223,7 @@ class _SignupState extends State<Signup> {
     );
   }
 
-  void validateForm() async {
-    Map value;
+  Future validateForm() async {
     FormState formState = _formKey.currentState;
 
     if (formState.validate()) {
@@ -234,7 +234,7 @@ class _SignupState extends State<Signup> {
                 email: _emailTexController.text,
                 password: _passwordTexController.text)
             .then((user) => {
-                  _userServices.createUser(user.user.uid, {
+                  _userServices.createUser(user.user.uid.toString(), {
                     "username": user.user.displayName,
                     "email": user.user.email,
                     "userId": user.user.uid,
